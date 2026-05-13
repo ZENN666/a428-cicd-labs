@@ -5,9 +5,10 @@ node {
 
     docker.image('node:lts-buster-slim').inside('-p 9999:3000') {
         
-        withEnv(['CI=true']) {
+        withEnv(['npm_config_cache=/tmp/.npm', 'CI=true']) {
             
             stage('Build') {
+                sh 'mkdir -p /tmp/.npm'
                 sh 'npm install'
             }
             
