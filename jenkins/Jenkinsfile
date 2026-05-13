@@ -5,10 +5,14 @@ node {
 
     docker.image('node:lts-buster-slim').inside('-p 9999:3000') {
         
-        withEnv(['npm_config_cache=/tmp/.npm', 'CI=true']) {
-            
+       
+        stage('Fix Permissions') {
+            sh 'mkdir -p /.npm'
+            sh 'chmod -R 777 /.npm'
+        }
+
+        withEnv(['CI=true']) {
             stage('Build') {
-                sh 'mkdir -p /tmp/.npm'
                 sh 'npm install'
             }
             
@@ -21,7 +25,6 @@ node {
                 input message: 'Finished using the website? (Click "Proceed" to continue)'
                 sh './jenkins/scripts/kill.sh'
             }
-            
         }
     }
 }
