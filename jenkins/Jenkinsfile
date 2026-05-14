@@ -1,4 +1,5 @@
 node {
+
     deleteDir()
 
     stage('Checkout') {
@@ -7,10 +8,11 @@ node {
 
     docker.image('node:16-alpine').inside('-p 3000:3000') {
         
-        withEnv(['CI=true', 'HOME=/tmp']) {
+        withEnv(['CI=true']) {
             
             stage('Build') {
-                sh 'npm install'
+            
+                sh 'npm install --cache /tmp/.npm-cache'
             }
             
             stage('Test') {
