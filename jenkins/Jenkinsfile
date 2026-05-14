@@ -1,7 +1,33 @@
-stage('Build') {
-    sh '''
-        echo "HOME=$HOME"
-        echo "npm cache: $(npm config get cache)"
-        npm config list
-    '''
+node {
+
+    deleteDir()
+
+    stage('Checkout') {
+        checkout scm
+    }
+
+    docker.image('node:16-alpine').inside('-p 3000:3000 -e HOME=/tmp -e npm_config_cache=/tmp/.npm-cache') {
+
+        stage('Build') {
+            sh '''
+                echo "HOME=$HOME"
+                echo "npm cache: $(npm config get cache)"
+                npm config list
+            '''
+        }
+
+        stage('Test') {
+            sh './jenkins/scripts/test.sh'
+        }
+
+        stage('Manual Approval') {
+            input message: 'Lanjutkan ke tahap Deploy?'
+        }
+
+        stage('Deploy') {
+            sh './jenkins/scripts/deliver.sh'
+            sleep time: 60, unit: 'SECONDS'
+            sh './jenkins/scripts/kill.sh'
+        }
+    }
 }
