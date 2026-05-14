@@ -1,34 +1,31 @@
 node {
+
     deleteDir()
 
     stage('Checkout') {
         checkout scm
     }
 
-    docker.image('node:16-alpine').inside('-p 3000:3000') {
+  
+    docker.image('node:16-alpine').inside('-p 3000:3000 -e HOME=/tmp -e npm_config_cache=/tmp/.npm-cache') {
         
-        withEnv(['CI=true']) {
-            
-            stage('Build') {
-                
-                sh 'HOME=$(pwd) npm install'
-            }
-            
-            stage('Test') {
-               
-                sh 'HOME=$(pwd) ./jenkins/scripts/test.sh'
-            }
-            
-            stage('Manual Approval') {
-                input message: 'Lanjutkan ke tahap Deploy?'
-            }
-            
-            stage('Deploy') {
-                sh 'HOME=$(pwd) ./jenkins/scripts/deliver.sh'
-                sleep time: 60, unit: 'SECONDS'
-                sh './jenkins/scripts/kill.sh'
-            }
-            
+        stage('Build') {
+            sh 'npm install'
         }
+        
+        stage('Test') {
+            sh './jenkins/scripts/test.sh'
+        }
+        
+        stage('Manual Approval') {
+            input message: 'Lanjutkan ke tahap Deploy?'
+        }
+        
+        stage('Deploy') {
+            sh './jenkins/scripts/deliver.sh'
+            sleep time: 60, unit: 'SECONDS'
+            sh './jenkins/scripts/kill.sh'
+        }
+        
     }
 }
