@@ -6,13 +6,16 @@ node {
         checkout scm
     }
 
-    docker.image('node:16-alpine').inside('-p 3000:3000') {
+    docker.image('node:16-alpine').inside('-p 3000:3000 -e HOME=/tmp') {
         
-        withEnv(['CI=true']) {
+        withEnv([
+            'CI=true',
+            'npm_config_cache=/tmp/.npm-cache',  
+            'HOME=/tmp'                          
+        ]) {
             
             stage('Build') {
-            
-                sh 'npm install --cache /tmp/.npm-cache'
+                sh 'npm install --cache /tmp/.npm-cache --no-fund --prefer-offline || npm install --cache /tmp/.npm-cache'
             }
             
             stage('Test') {
@@ -28,7 +31,6 @@ node {
                 sleep time: 60, unit: 'SECONDS'
                 sh './jenkins/scripts/kill.sh'
             }
-            
         }
     }
 }
