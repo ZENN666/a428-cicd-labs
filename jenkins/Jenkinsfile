@@ -3,9 +3,11 @@ node {
         checkout scm
     }
 
+    // Balikin ke asal, hapus -u root:root nya
     docker.image('node:16-alpine').inside('-p 3000:3000') {
         
-        withEnv(['CI=true']) {
+        // Kita paksa npm bikin cache di dalam folder project aja biar nggak ditolak sistem
+        withEnv(['CI=true', 'npm_config_cache=npm-cache']) {
             
             stage('Build') {
                 sh 'npm install'
