@@ -5,14 +5,11 @@ node {
 
     docker.image('node:16-alpine').inside('-p 3000:3000') {
         
-        withEnv(['CI=true']) {
+    
+        withEnv(['CI=true', 'HOME=/tmp']) {
             
             stage('Build') {
-                
-                sh 'rm -rf node_modules'
-                sh 'rm -rf .npm-cache'
-                
-                sh 'npm install --cache .npm-cache'
+                sh 'npm install'
             }
             
             stage('Test') {
