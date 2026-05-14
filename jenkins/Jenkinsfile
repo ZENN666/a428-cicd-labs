@@ -3,7 +3,7 @@ node {
         checkout scm
     }
 
-    docker.image('node:lts-buster-slim').inside('-p 9999:3000 -u root:root') {
+    docker.image('node:16-alpine').inside('-p 3000:3000') {
         
         withEnv(['CI=true']) {
             
